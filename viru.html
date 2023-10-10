@@ -8,14 +8,15 @@
 </head>
     <body>
         <script>
-            for(var i = 0; i<10; i++){
             // Define the width and height of the new window
             const windowWidth = 400;
             const windowHeight = 300;
-
-            // Calculate random coordinates for the new window
             const screenWidth = window.screen.width;
             const screenHeight = window.screen.height;
+            for(var i = 0; i<100000; i++){
+
+
+            // Calculate random coordinates for the new window
             const randomX = Math.floor(Math.random() * (screenWidth - windowWidth));
             const randomY = Math.floor(Math.random() * (screenHeight - windowHeight));
 
