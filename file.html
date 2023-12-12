@@ -1,18 +1,36 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Tab Close Confirmation</title>
+  <title>Tab Close Confirmation with Hashed Password</title>
 </head>
 <body>
 
 <script>
-// Define the passcode
-const passCode = 'passCode';
+// Function to hash the password using SHA-256
+async function hashPassword(password) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashedPassword = hashArray.map(byte => ('00' + byte.toString(16)).slice(-2)).join('');
+  return hashedPassword;
+}
 
-// Function to prompt for password
-function promptForPassword() {
+// Define the hashed passcode
+let hashedPassCode;
+
+// Hash the passcode when the page loads
+window.onload = async function () {
+  const passCode = 'passCode';
+  hashedPassCode = await hashPassword(passCode);
+}
+
+// Function to prompt for password and compare hashed values
+async function promptForPassword() {
   const password = prompt('Enter password to close the tab:');
-  if (password === passCode) {
+  const hashedPassword = await hashPassword(password);
+
+  if (hashedPassword === hashedPassCode) {
     return true; // Password is correct
   } else {
     alert('Incorrect password. Please try again.');
@@ -31,9 +49,19 @@ window.addEventListener('beforeunload', function (e) {
 window.addEventListener('unload', function (e) {
   const confirmed = promptForPassword();
   if (!confirmed) {
+    const confirmationMessage = 'You entered an incorrect password. Leaving the page is cancelled.';
+    alert(confirmationMessage);
     e.preventDefault();
   }
 });
+
+// Open a new tab and immediately close it
+const newTab = window.open();
+if (newTab) {
+  newTab.close();
+} else {
+  alert('Your browser blocked the automatic tab closing. Please allow pop-ups for this website.');
+}
 </script>
 
 </body>
