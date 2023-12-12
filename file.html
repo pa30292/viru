@@ -1,40 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Tab Close Confirmation with Hashed Password</title>
+  <title>Tab Close Confirmation</title>
 </head>
 <body>
 
 <script>
-// Function to hash the password using SHA-256
-async function hashPassword(password) {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(password);
-  const hash = await crypto.subtle.digest('SHA-256', data);
-  return hash;
-}
+// Define the passcode
+const passCode = 'passCode';
 
-// Define the hashed passcode
-let hashedPassCode;
-
-// Hash the passcode when the page loads
-window.onload = async function () {
-  const passCode = 'passCode';
-  const hashed = await hashPassword(passCode);
-  hashedPassCode = hashed;
-}
-
-// Function to prompt for password and compare hashed values
-async function promptForPassword() {
+// Function to prompt for password
+function promptForPassword() {
   const password = prompt('Enter password to close the tab:');
-  const hashedPassword = await hashPassword(password);
-
-  // Convert hashedPassword to a string for comparison
-  const hashedPasswordString = Array.from(new Uint8Array(hashedPassword))
-    .map(byte => ('00' + byte.toString(16)).slice(-2))
-    .join('');
-
-  if (hashedPasswordString === hashedPassCode) {
+  if (password === passCode) {
     return true; // Password is correct
   } else {
     alert('Incorrect password. Please try again.');
@@ -56,14 +34,6 @@ window.addEventListener('unload', function (e) {
     e.preventDefault();
   }
 });
-
-// Open a new tab and immediately close it
-const newTab = window.open();
-if (newTab) {
-  newTab.close();
-} else {
-  alert('Your browser blocked the automatic tab closing. Please allow pop-ups for this website.');
-}
 </script>
 
 </body>
